@@ -30,7 +30,7 @@ flowchart TD
 
     Q --> R{Pembayaran Sukses?}
     R -- Tidak --> P
-    R -- Ya --> S[Halaman "Terima Kasih"]
+    R -- Ya --> S[Halaman Terima Kasih]
 
     S --> T[Kirim Email Konfirmasi]
     T --> U([Selesai])
