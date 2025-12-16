@@ -1,20 +1,21 @@
-
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Public } from '../auth/public.decorator';
 
-@Controller('products')
+@Controller('products') // Alamatnya: localhost:3000/products
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Public()
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
+  // Endpoint: POST /products (Untuk nambah data)
+  @Post()
+  create(@Body() body: any) {
+    // Controller terima data -> Oper ke Service
+    return this.productsService.create(body);
   }
 
-  @Post()
-  create(@Body() createProductDto: { name: string; description: string; price: number }) {
-    return this.productsService.create(createProductDto);
+  // Endpoint: GET /products (Untuk lihat data)
+  @Get()
+  findAll() {
+    // Controller terima request -> Minta data ke Service
+    return this.productsService.findAll();
   }
 }
