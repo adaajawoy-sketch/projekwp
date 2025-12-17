@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 
 // --- TIPE DATA ---
 interface Product {
@@ -60,7 +60,7 @@ export default function Home() {
 
   const totalPrice = cart.reduce((total, item) => total + item.price, 0);
 
-  const handleCheckout = (e: React.FormEvent) => {
+  const handleCheckout = (e: FormEvent) => {
     e.preventDefault();
     setCheckoutStep("success");
     setCart([]); // Kosongkan keranjang setelah sukses
