@@ -1,126 +1,178 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ShoppingCart, Phone } from "lucide-react";
 
-// Tipe data untuk Produk
-type Product = {
+interface Product {
   id: number;
   name: string;
-  description: string;
-  price: number; // Mengasumsikan harga berupa angka dari backend
-  image?: string;
-};
+  price: number;
+  image: string | null;
+  description?: string;
+}
 
-// Fungsi untuk mengambil data produk dari Backend
-async function getProducts(): Promise<Product[] | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-  
+async function getProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(`${apiUrl}/products`, { 
-      cache: "no-store", // Pastikan data selalu fresh
+    const res = await fetch("http://localhost:3001/products", {
+      cache: "no-store",
     });
-
     if (!res.ok) {
-      throw new Error(`Failed to fetch: ${res.statusText}`);
+      console.error("Failed to fetch products:", res.statusText);
+      return [];
     }
-
     return res.json();
   } catch (error) {
-    console.error("Error fetching products:", error);
-    return null; // Return null to indicate error state
+    console.error("Failed to fetch products:", error);
+    return [];
   }
 }
 
-// Helper untuk format Rupiah
-const formatRupiah = (amount: number) => {
+const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
-  }).format(amount);
+    maximumFractionDigits: 0,
+  }).format(number);
 };
 
 export default async function Home() {
   const products = await getProducts();
 
-  // Navbar Component
-  const Navbar = () => (
-    <nav className="w-full bg-white shadow-md py-4 px-6 mb-8">
-      <div className="container mx-auto">
-        <h1 className="text-2xl font-bold tracking-wider text-slate-800">
-          LUMINA SPACES
-        </h1>
-      </div>
-    </nav>
-  );
-
-  // Jika Backend Error / Tidak ada data
-  if (products === null) {
-    return (
-      <main className="min-h-screen bg-slate-50 flex flex-col items-center">
-        <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-          <h2 className="text-2xl font-semibold text-slate-700 mb-2">
-            Maaf, server sedang sibuk
-          </h2>
-          <p className="text-slate-500">
-            Kami sedang berusaha memperbaikinya. Silakan coba lagi nanti.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-slate-50 pb-12">
-      <Navbar />
+    <div className="min-h-screen bg-[#FDF3E7] font-sans text-gray-900">
+      {/* Navbar */}
+      <nav className="container mx-auto px-4 py-6 flex items-center justify-between">
+        <Link href="/" className="font-serif font-bold text-3xl tracking-wide">
+          NightStalkers
+        </Link>
 
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Grid System: Mobile 1, Tablet 2, Desktop 3/4 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col"
-            >
-              {/* Product Image */}
-              <div className="relative h-48 w-full bg-gray-200">
-                <Image
-                  src={product.image || "https://placehold.co/600x400"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Card Content */}
-              <div className="p-5 flex flex-col flex-1">
-                <h3 className="text-lg font-bold text-slate-800 mb-1 line-clamp-1">
-                  {product.name}
-                </h3>
-                
-                <p className="text-xl font-semibold text-indigo-600 mb-3">
-                  {formatRupiah(product.price)}
-                </p>
-
-                <p className="text-sm text-slate-500 mb-4 line-clamp-2 flex-1">
-                  {product.description}
-                </p>
-
-                {/* Button */}
-                <button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 mt-auto">
-                  Beli Sekarang
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="hidden md:flex items-center space-x-8 font-medium">
+          <Link href="/" className="hover:text-[#E85D04] transition-colors">
+            Beranda
+          </Link>
+          <Link href="/about" className="hover:text-[#E85D04] transition-colors">
+            Tentang
+          </Link>
+          <Link href="/products" className="hover:text-[#E85D04] transition-colors">
+            Produk
+          </Link>
+          <Link href="/contact" className="hover:text-[#E85D04] transition-colors">
+            Kontak
+          </Link>
         </div>
 
-        {/* Empty State jika array kosong tapi tidak error */}
-        {products.length === 0 && (
-          <div className="text-center py-20 text-slate-500">
-            Belum ada produk yang tersedia.
+        <div className="flex items-center space-x-4">
+           {/* Icons matching the reference image vaguely, though not strictly requested by text, nice to have */}
+          <button className="hidden sm:block p-2 hover:text-[#E85D04]">
+             <ShoppingCart className="w-6 h-6" />
+          </button>
+
+          <Link
+            href="/webtoon"
+            className="hidden md:block bg-[#E85D04] text-white px-6 py-2 rounded-full font-medium hover:bg-[#d55203] transition-colors"
+          >
+            Baca di Webtoon
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
+        {/* Background Image */}
+        <Image
+          src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=2400"
+          alt="Dark Library"
+          fill
+          className="object-cover"
+          priority
+        />
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* Content */}
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center text-[#FDF3E7]">
+           {/* Star Rating decoration - matching image vibe */}
+           <div className="mb-4 text-[#E85D04] flex gap-1">
+             {[...Array(5)].map((_, i) => (
+                <span key={i} className="text-xl">★</span>
+             ))}
+           </div>
+
+          <h1 className="font-serif text-4xl md:text-6xl font-bold mb-4 tracking-wider uppercase">
+            NIGHT STALKERS NOVEL & KOMIK
+          </h1>
+          <p className="text-lg md:text-2xl font-light italic opacity-90 mb-8 max-w-2xl">
+            "Mengungkap kegelapan di balik bayangan..."
+          </p>
+
+          <div className="flex gap-4">
+             <Link href="/contact" className="border border-white px-8 py-3 rounded-full hover:bg-white hover:text-black transition-all">
+                Kontak kami
+             </Link>
+             <Link href="/webtoon" className="text-white hover:text-[#E85D04] flex items-center gap-2 px-4 py-3">
+                Webtoon kami →
+             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Sub-headline Section - To match image layout where text is below hero */}
+      <section className="py-16 text-center container mx-auto px-4">
+          <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
+            Mengungkap kegelapan di balik bayangan, kisah-kisah yang tak akan membiarkan Anda tidur.
+          </h2>
+      </section>
+
+      {/* Product Grid */}
+      <section className="container mx-auto px-4 pb-20">
+        <h3 className="font-serif text-2xl font-bold mb-8 border-b-2 border-[#E85D04] inline-block pb-2">
+            Koleksi Terbaru
+        </h3>
+
+        {products.length === 0 ? (
+          <p className="text-center text-gray-500 py-10">Belum ada produk yang tersedia.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
+              >
+                <div className="relative aspect-[2/3] w-full bg-gray-200">
+                  <Image
+                    src={product.image || "https://placehold.co/400x600/png?text=Cover"}
+                    alt={product.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  {/* Quick Action Overlay */}
+                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button className="bg-[#E85D04] text-white px-4 py-2 rounded-full text-sm font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                        Lihat Detail
+                      </button>
+                   </div>
+                </div>
+
+                <div className="p-4">
+                  <h4 className="font-serif font-bold text-lg mb-2 truncate">
+                    {product.name}
+                  </h4>
+                  <div className="flex justify-between items-center">
+                     <p className="text-[#E85D04] font-bold text-lg">
+                        {formatRupiah(product.price)}
+                     </p>
+                     <button className="text-gray-400 hover:text-[#E85D04]">
+                        <ShoppingCart className="w-5 h-5" />
+                     </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-      </div>
-    </main>
+      </section>
+    </div>
   );
 }
